@@ -1,0 +1,58 @@
+﻿@model IEnumerable<Skill>
+
+@{
+    ViewData["Title"] = "Skills";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<p>
+    @Html.ActionLink("Create skill", "Create")
+</p>
+<div class="md-form mb-3">
+    <input class=" form-control" type="text" value="@ViewData["filter"]" autofocus placeholder="Search" 
+    aria-label="Search" onkeyup="skillSearch(event, this.value);">   
+</div>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model=>model.SkillID)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model=>model.SkillName)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var item in Model.OrderBy(s=>s.SkillName)){
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem=>item.SkillID)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem=>item.SkillName)
+                </td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new{id=item.SkillID}) |
+                    @Html.ActionLink("Delete", "Delete", new {id=item.SkillID}, new {onclick="return deleteSkillModal();"})
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts{
+    <script>
+        function deleteSkillModal(){
+            return confirm('Are you sure?');
+        }
+
+        function skillSearch(e, filter){
+            if(e.keyCode==13){
+                window.location.href="/Skill/Index?filter="+filter;
+            }
+        }
+    </script>
+}

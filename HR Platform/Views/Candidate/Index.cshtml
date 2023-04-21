@@ -1,0 +1,117 @@
+﻿@model CandidateListView
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Candidates</h2>
+
+<p>
+    <a asp-action="Create">Add candidate</a>
+</p>
+<div class="row">
+    <div class="md-form active-pink-2 mb-3">
+        <input id="candidateMainFilter" class="form-control" type="text" value="@Model.Filter" autofocus placeholder="Search"
+        aria-label="Search" onkeyup="filterInputKey(event);">
+    </div>
+    <div class="col-md-12">
+        <div class="row">
+            <div class="col-md-2 candidateFilterContainer">
+                <label>Skills:</label>
+                <ul id="skillsFilter" class="skillsFilter">
+                    @foreach(var item in Model.SkillFilter) {
+                        <li>
+                            <input type="checkbox" id="@item.Id" value="@item.Id" checked="@item.Selected" onclick="candidateSearch();" />
+                            <label>@item.Name</label>
+                        </li>
+                    }
+                </ul>
+            </div>
+            <div class="col-md-10">
+                <table class="table candidate-table">
+                    <thead>
+                        <tr>
+                            <th style="width:20px">
+                                Serial number
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model=>model.Candidates.First().CandidateID)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model=>model.Candidates.First().FullName)
+                            </th>
+                            
+                            <th style="width:200px">
+                                Actions
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            int sn = 1;
+                        }
+                        @foreach(var item in Model.Candidates.OrderBy(c=>c.FullName)) {
+                            <tr>
+                                <td class="text-center">
+                                    @sn
+                                </td>
+                                <td class=" text-center">
+                                    @Html.DisplayFor(modelItem=>item.CandidateID)
+                                </td>
+                                <td class=" text-center">
+                                    @Html.DisplayFor(modelItem=>item.FullName)
+                                </td>
+                                <td class="text-center">
+                                    @Html.ActionLink("Review", "Details", new {id=item.CandidateID}) |
+                                    @Html.ActionLink("Edit", "Edit", new {id=item.CandidateID}) |
+                                    @Html.ActionLink("Delete", "Delete", new {id=item.CandidateID}, new {onclick="return deleteCandidateModal();"})
+                                </td>
+                            </tr>
+                            sn++;
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    //funkcija koja se poziva na klik dugmeta delete kandidata
+    function deleteCandidateModal(){
+        return confirm('Are you sure?');
+    }
+
+    //funkcija koja se poziva na keypress inputa za filter
+    function filterInputKey(e) {
+        //ako je enter
+        if (e.keyCode == 13) {
+            candidateSearch();
+        }
+    }
+
+        //funkcija koja pravi query i menja url stranice
+        function candidateSearch(){
+            let filter=document.getElementById("candidateMainFilter").value;
+
+            var skillFilter='';
+            //uzima element po id za filter skill-ova
+            var ul = document.getElementById("skillsFilter");
+            //uzima li elemente iz ul
+            var items = ul.getElementsByTagName("li");
+            //za svaki li element u ul listi
+          for (var i = 0; i < items.length; ++i) {
+            //u li elementu nalazi input elemente po tagu ali nama treba samo prvi
+            let cb = items[i].getElementsByTagName('input')[0];
+            //ako je cekiran dodaj ga u filter
+            if (cb.checked) {
+                skillFilter += '&skills=' + cb.value;
+            }
+          }
+        //kreiraj ceo query string
+        let qs = '/candidate/Index?filter=' + filter + skillFilter;
+        //promeni lokaciju strane, tj odradi GET ka serveru
+        window.location.href = qs;
+        }
+
+</script>
